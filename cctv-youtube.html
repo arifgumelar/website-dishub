@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCTV YouTube Live Stream - Dinas Perhubungan Kota Pontianak</title>
+    <meta name="description"
+        content="Pantau CCTV lalu lintas secara langsung melalui live streaming YouTube channel perhubungan secara real-time.">
+    <meta name="keywords" content="CCTV YouTube, Live Streaming, Dishub, Pontianak, ATCS, Wilayah 2">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eef6ff',
+                            100: '#d9eaff',
+                            200: '#bbdaff',
+                            300: '#8cc3ff',
+                            400: '#55a2ff',
+                            500: '#2d7eff',
+                            600: '#155bf5',
+                            700: '#0e47e1',
+                            800: '#123ab6',
+                            900: '#15358f',
+                            950: '#0f1f52',
+                        },
+                        accent: {
+                            50: '#fffbeb',
+                            100: '#fff3c6',
+                            200: '#ffe588',
+                            300: '#ffd24a',
+                            400: '#ffbf20',
+                            500: '#f99d07',
+                            600: '#dd7602',
+                            700: '#b75206',
+                            800: '#943f0c',
+                            900: '#7a340d',
+                            950: '#461a02',
+                        },
+                        dark: {
+                            800: '#1a1f2e',
+                            900: '#0f1219',
+                            950: '#080a10',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-soft': 'pulseSoft 2s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        pulseSoft: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0.7' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px rgba(45, 126, 255, 0.3)' },
+                            '100%': { boxShadow: '0 0 20px rgba(45, 126, 255, 0.6)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1219;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2d7eff;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #155bf5;
+        }
+
+        /* Glass morphism effect */
+        .glass {
+            background: rgba(15, 18, 25, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-light {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* CCTV live indicator */
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulseSoft 1.5s ease-in-out infinite;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+        }
+
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #2d7eff 0%, #55a2ff 50%, #ffd24a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Mesh gradient background */
+        .mesh-gradient {
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(45, 126, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(249, 157, 7, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 80%, rgba(14, 71, 225, 0.1) 0%, transparent 50%);
+        }
+
+        /* CCTV card hover effect */
+        .cctv-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .cctv-card:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(45, 126, 255, 0.15);
+        }
+
+        .cctv-card:hover .cctv-overlay {
+            opacity: 1;
+        }
+
+        .cctv-card:hover img {
+            transform: scale(1.04);
+        }
+
+        /* Mobile menu transitions */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+
+<body class="bg-dark-950 text-gray-300 font-sans min-h-screen flex flex-col relative overflow-x-hidden">
+    <div class="absolute inset-0 mesh-gradient opacity-40 pointer-events-none"></div>
+
+    <!-- ===================== NAVIGATION ===================== -->
+    <nav id="navbar" class="sticky top-0 z-50 glass transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-16 lg:h-20">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-3 group" id="nav-logo">
+                    <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:shadow-primary-500/40 transition-shadow">
+                        <img src="assets/img/logo.png" alt="Logo Dishub" class="w-8 h-8 lg:w-10 lg:h-10 object-contain rounded-lg">
+                    </div>
+                    <div class="hidden sm:block">
+                        <p class="font-bold text-sm lg:text-base text-white leading-tight">DISHUB</p>
+                        <p class="text-[10px] lg:text-xs text-primary-300 font-medium tracking-wider font-mono">KOTA PONTIANAK</p>
+                    </div>
+                </a>
+
+                <!-- Desktop Menu -->
+                <div class="hidden lg:flex items-center gap-1">
+                    <a href="index.html#beranda" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-primary-300 rounded-lg hover:bg-white/5 transition-all">Beranda</a>
+                    <a href="index.html#cctv" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-primary-300 rounded-lg hover:bg-white/5 transition-all">CCTV Lokal</a>
+                    <!-- <a href="cctv-youtube.html" class="px-4 py-2 text-sm font-medium text-white hover:text-primary-300 rounded-lg hover:bg-white/5 transition-all">CCTV YouTube</a> -->
+                    <a href="index.html#layanan" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-primary-300 rounded-lg hover:bg-white/5 transition-all">Layanan</a>
+                    <a href="index.html#berita" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-primary-300 rounded-lg hover:bg-white/5 transition-all">Berita</a>
+                    <a href="index.html#kontak" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-primary-300 rounded-lg hover:bg-white/5 transition-all">Kontak</a>
+                </div>
+
+                <!-- CTA & Mobile Toggle -->
+                <div class="flex items-center gap-3">
+                    <a href="index.html#layanan" class="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white text-sm font-semibold rounded-xl transition-all shadow-lg shadow-primary-500/25">
+                        <i data-lucide="layers" class="w-4 h-4"></i>
+                        Layanan Online
+                    </a>
+                    <button id="mobileMenuBtn" class="lg:hidden p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-all">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="mobile-menu fixed top-0 right-0 w-72 h-full bg-dark-900/98 backdrop-blur-xl border-l border-white/10 z-50 lg:hidden">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <span class="font-bold text-lg text-white">Menu</span>
+                    <button id="mobileMenuClose" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/5">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <a href="index.html#beranda" class="mobile-link px-4 py-3 text-sm font-medium text-gray-300 hover:text-white rounded-xl hover:bg-white/5 transition-all flex items-center gap-3">
+                        <i data-lucide="home" class="w-4 h-4 text-primary-400"></i> Beranda
+                    </a>
+                    <a href="index.html#cctv" class="mobile-link px-4 py-3 text-sm font-medium text-gray-300 hover:text-white rounded-xl hover:bg-white/5 transition-all flex items-center gap-3">
+                        <i data-lucide="video" class="w-4 h-4 text-primary-400"></i> CCTV Lokal
+                    </a>
+                    <!-- <a href="cctv-youtube.html" class="mobile-link px-4 py-3 text-sm font-medium text-white rounded-xl bg-white/5 transition-all flex items-center gap-3">
+                        <i data-lucide="youtube" class="w-4 h-4 text-red-500"></i> CCTV YouTube
+                    </a> -->
+                    <a href="index.html#layanan" class="mobile-link px-4 py-3 text-sm font-medium text-gray-300 hover:text-white rounded-xl hover:bg-white/5 transition-all flex items-center gap-3">
+                        <i data-lucide="layers" class="w-4 h-4 text-primary-400"></i> Layanan
+                    </a>
+                    <a href="index.html#kontak" class="mobile-link px-4 py-3 text-sm font-medium text-gray-300 hover:text-white rounded-xl hover:bg-white/5 transition-all flex items-center gap-3">
+                        <i data-lucide="phone" class="w-4 h-4 text-primary-400"></i> Kontak
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ===================== MAIN CONTENT ===================== -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-12 relative z-10">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-light text-sm text-red-400 mb-4 animate-pulse-soft">
+                <i data-lucide="youtube" class="w-4 h-4 text-red-500"></i>
+                YOUTUBE CCTV LIVE STREAM (API v3)
+            </div>
+            <h1 class="text-3xl lg:text-5xl font-extrabold mb-4">
+                <span class="text-white">Pemantauan </span>
+                <span class="gradient-text">CCTV YouTube</span>
+            </h1>
+            <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                Masukkan handle channel YouTube (misalnya <span class="text-primary-300 font-mono">@CCTVWilayah2</span>) untuk memuat semua video live stream dan rekaman CCTV secara real-time.
+            </p>
+        </div>
+
+        <!-- Search & Control Panel -->
+        <div class="hidden glass rounded-3xl p-6 lg:p-8 mb-10 max-w-3xl mx-auto relative overflow-hidden">
+            <form id="searchForm" class="flex flex-col sm:flex-row gap-4">
+                <div class="relative flex-grow">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </span>
+                    <input type="text" id="channelInput" 
+                        class="w-full pl-12 pr-4 py-3.5 bg-dark-900/60 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all font-medium"
+                        placeholder="Masukkan handle channel (misal: @CCTVWilayah2)"
+                        value="@CCTVDISHUBKOTAPONTIANAK" required>
+                </div>
+                <button type="submit" 
+                    class="px-8 py-3.5 bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold rounded-2xl transition-all shadow-lg shadow-primary-500/20 flex items-center justify-center gap-2">
+                    <i data-lucide="search" id="searchBtnIcon" class="w-5 h-5"></i>
+                    <span>Cari CCTV</span>
+                </button>
+            </form>
+
+            <!-- Control Bar (Preset & API Key settings button) -->
+            <div class="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-white/5">
+                <!-- Preset Channels -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Preset:</span>
+                    <button type="button" onclick="loadPreset('@CCTVWilayah2')" 
+                        class="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-xl text-xs font-semibold text-white transition-all">
+                        @CCTVWilayah2 (Pusat)
+                    </button>
+                    <button type="button" onclick="loadPreset('@ATCSPontianak')" 
+                        class="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-xl text-xs font-semibold text-white transition-all">
+                        @ATCSPontianak
+                    </button>
+                </div>
+
+                <!-- API Key Manager Toggle -->
+                <button type="button" onclick="toggleApiSettings()" 
+                    class="text-xs text-gray-400 hover:text-white transition-colors flex items-center gap-1.5 self-start sm:self-auto">
+                    <i data-lucide="key" class="w-3.5 h-3.5 text-accent-400"></i>
+                    Pengaturan API Key
+                </button>
+            </div>
+
+            <!-- API Settings Section (collapsible) -->
+            <div id="apiSettingsArea" class="hidden mt-4 p-4 bg-dark-900/60 border border-white/5 rounded-2xl">
+                <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wide">YouTube Data API v3 Key</label>
+                <div class="flex gap-2">
+                    <input type="password" id="apiKeyInput" 
+                        class="flex-grow px-4 py-2 bg-dark-950 border border-white/10 rounded-xl text-white text-sm focus:outline-none focus:border-primary-500 transition-all font-mono"
+                        placeholder="Masukkan API Key...">
+                    <button type="button" onclick="saveApiKey()" 
+                        class="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white text-xs font-bold rounded-xl transition-all">
+                        Simpan
+                    </button>
+                </div>
+                <p class="text-[10px] text-gray-500 mt-2">
+                    Kosongkan untuk kembali menggunakan API Key default bawaan. API Key disimpan secara lokal di browser Anda.
+                </p>
+            </div>
+        </div>
+
+        <!-- Channel Metadata Display -->
+        <div id="channelHeader" class="hidden glass-light rounded-3xl p-6 mb-10 flex flex-col md:flex-row items-center gap-6 border border-white/10">
+            <div id="channelAvatar" class="w-20 h-20 rounded-full overflow-hidden bg-white/10 flex-shrink-0 border-2 border-primary-500/30 flex items-center justify-center">
+                <i data-lucide="user" class="w-10 h-10 text-gray-400"></i>
+            </div>
+            <div class="text-center md:text-left flex-grow">
+                <div class="flex flex-col md:flex-row md:items-center gap-2">
+                    <h2 id="channelTitle" class="text-2xl font-bold text-white">Nama Channel</h2>
+                    <span id="channelHandle" class="text-sm font-mono text-primary-400 font-medium">@handle</span>
+                </div>
+                <p id="channelDesc" class="text-sm text-gray-400 mt-2 max-w-3xl line-clamp-2">Deskripsi channel...</p>
+            </div>
+            <a id="channelLink" href="#" target="_blank" 
+                class="px-5 py-2.5 bg-red-600/10 hover:bg-red-600/20 border border-red-500/20 text-red-400 text-sm font-semibold rounded-xl transition-all flex items-center gap-2">
+                <i data-lucide="youtube" class="w-4 h-4 text-red-500"></i>
+                Buka Channel
+            </a>
+        </div>
+
+        <!-- Tabs Filter -->
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex gap-2 p-1 bg-dark-900/60 border border-white/5 rounded-2xl">
+                <button id="tabLive" onclick="switchTab('live')" 
+                    class="px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all bg-primary-600 text-white shadow-lg shadow-primary-500/10">
+                    <div class="live-dot"></div>
+                    Live Streams
+                </button>
+                <button id="tabUploads" onclick="switchTab('uploads')" 
+                    class="px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all text-gray-400 hover:text-white hover:bg-white/5">
+                    <i data-lucide="video" class="w-4 h-4"></i>
+                    Semua Video
+                </button>
+            </div>
+            <div id="videoCount" class="text-sm text-gray-500 font-medium font-mono">
+                Menampilkan 0 CCTV
+            </div>
+        </div>
+
+        <!-- Feedback & Loading Section -->
+        <div id="loadingState" class="hidden py-24 flex flex-col items-center justify-center">
+            <div class="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-gray-400 font-medium animate-pulse">Menghubungi YouTube API...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="hidden py-16 px-6 glass border-red-500/20 rounded-3xl flex flex-col items-center justify-center text-center max-w-xl mx-auto">
+            <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mb-4 border border-red-500/20">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Gagal Memuat Data</h3>
+            <p id="errorMessage" class="text-gray-400 text-sm mb-6">Terjadi kesalahan saat memanggil YouTube Data API. Pastikan API Key valid dan nama channel sudah benar.</p>
+            <div class="flex gap-4">
+                <button onclick="toggleApiSettings()" class="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/20 rounded-xl text-sm font-semibold transition-all">
+                    Cek API Key
+                </button>
+                <button onclick="retryLoading()" class="px-5 py-2.5 bg-primary-600 hover:bg-primary-500 text-white rounded-xl text-sm font-semibold transition-all">
+                    Coba Lagi
+                </button>
+            </div>
+        </div>
+
+        <!-- Video Grid -->
+        <div id="videoGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamically populated -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden py-20 flex flex-col items-center justify-center text-center max-w-md mx-auto">
+            <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center text-gray-500 mb-4 border border-white/5">
+                <i data-lucide="video-off" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Tidak Ada Video</h3>
+            <p class="text-gray-400 text-sm">Tidak ditemukan live streaming aktif atau video di kategori tab ini.</p>
+        </div>
+    </main>
+
+    <!-- ===================== FLOATING VIDEO PLAYER MODAL ===================== -->
+    <div id="playerModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300 flex items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl glass rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col scale-95 transition-transform duration-300" id="modalContainer">
+            <!-- Modal Header -->
+            <div class="p-4 lg:p-5 flex items-center justify-between border-b border-white/10">
+                <div class="flex items-center gap-3">
+                    <span id="playerBadge" class="flex items-center gap-1 px-2.5 py-1 bg-red-600 rounded-lg text-[10px] font-bold text-white">
+                        <div class="live-dot"></div> LIVE
+                    </span>
+                    <h3 id="playerTitle" class="font-bold text-white truncate max-w-[200px] sm:max-w-md md:max-w-xl text-sm sm:text-base">Judul CCTV YouTube</h3>
+                </div>
+                <button onclick="closePlayer()" class="p-2 text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-all">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <!-- Iframe Wrapper (Aspect Ratio 16:9) -->
+            <div class="relative w-full aspect-video bg-black flex items-center justify-center">
+                <iframe id="youtubeEmbed" class="absolute inset-0 w-full h-full border-0" 
+                    src="" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+                
+                <!-- Custom non-embeddable warning overlay -->
+                <div id="embedDisabledOverlay" class="hidden absolute inset-0 bg-dark-950/95 flex flex-col items-center justify-center p-6 text-center z-10">
+                    <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center text-red-500 mb-4 border border-red-500/20">
+                        <i data-lucide="youtube" class="w-8 h-8"></i>
+                    </div>
+                    <h4 class="text-lg font-bold text-white mb-2">Pemutaran Tersemat Dinonaktifkan</h4>
+                    <p class="text-gray-400 text-sm max-w-md mb-6">
+                        Pemilik video/saluran ini menonaktifkan fitur pemutaran di situs web eksternal. Silakan tonton langsung di YouTube.
+                    </p>
+                    <a id="embedDirectBtn" href="#" target="_blank" 
+                        class="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl shadow-lg shadow-red-600/20 flex items-center gap-2 transition-all">
+                        Tonton di YouTube <i data-lucide="external-link" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+            <!-- Modal Footer -->
+            <div class="p-4 bg-dark-900/50 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <p class="text-xs text-gray-500 font-medium flex items-center gap-1">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                    Memutar melalui YouTube Player API resmi
+                </p>
+                <a id="youtubeDirectLink" href="#" target="_blank" 
+                    class="text-xs text-primary-400 hover:text-primary-300 font-semibold flex items-center gap-1">
+                    Tonton langsung di YouTube <i data-lucide="external-link" class="w-3 h-3"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="bg-dark-950 border-t border-white/5 mt-20">
+        <div class="max-w-7xl mx-auto px-6 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="assets/img/logo.png" alt="Logo Dishub" class="w-6 h-6 object-contain">
+                <p class="text-xs text-gray-500">© 2026 Dinas Perhubungan Kota Pontianak. Hak Cipta Dilindungi.</p>
+            </div>
+            <div class="flex items-center gap-4 text-xs">
+                <a href="index.html" class="text-gray-500 hover:text-white transition-colors">Home</a>
+                <a href="index.html#cctv" class="text-gray-500 hover:text-white transition-colors">CCTV Lokal</a>
+                <a href="https://www.youtube.com/@CCTVWilayah2" target="_blank" class="text-gray-500 hover:text-white transition-colors flex items-center gap-1">
+                    YouTube Wilayah 2 <i data-lucide="youtube" class="w-3 h-3 text-red-500"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Default Configs
+        const DEFAULT_API_KEY = "AIzaSyA_YDe5TLSGxHT6WS8xRGMJ4Z1kRF0ImYc";
+        
+        // DOM Elements
+        const searchForm = document.getElementById('searchForm');
+        const channelInput = document.getElementById('channelInput');
+        const searchBtnIcon = document.getElementById('searchBtnIcon');
+        const videoGrid = document.getElementById('videoGrid');
+        const loadingState = document.getElementById('loadingState');
+        const errorState = document.getElementById('errorState');
+        const errorMessage = document.getElementById('errorMessage');
+        const emptyState = document.getElementById('emptyState');
+        const videoCount = document.getElementById('videoCount');
+        const channelHeader = document.getElementById('channelHeader');
+        
+        // Settings Elements
+        const apiSettingsArea = document.getElementById('apiSettingsArea');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        
+        // Modal Elements
+        const playerModal = document.getElementById('playerModal');
+        const modalContainer = document.getElementById('modalContainer');
+        const youtubeEmbed = document.getElementById('youtubeEmbed');
+        const playerTitle = document.getElementById('playerTitle');
+        const playerBadge = document.getElementById('playerBadge');
+        const youtubeDirectLink = document.getElementById('youtubeDirectLink');
+        const embedDisabledOverlay = document.getElementById('embedDisabledOverlay');
+        const embedDirectBtn = document.getElementById('embedDirectBtn');
+
+        // State variables
+        let currentChannel = '@CCTVDISHUBKOTAPONTIANAK';
+        let activeTab = 'live'; // 'live' or 'uploads'
+        let cachedData = {
+            live: [],
+            uploads: []
+        };
+        let channelMeta = null;
+
+        // Initialize Lucide Icons
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            
+            // Set input settings value if exists
+            const savedKey = localStorage.getItem('yt_api_key') || "";
+            apiKeyInput.value = savedKey;
+            
+            loadChannelData(currentChannel);
+        });
+
+        // Search Form Submission
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const val = channelInput.value.trim();
+            if (val) {
+                currentChannel = val;
+                loadChannelData(currentChannel);
+            }
+        });
+
+        // Load Preset Channels
+        function loadPreset(handle) {
+            channelInput.value = handle;
+            currentChannel = handle;
+            loadChannelData(currentChannel);
+        }
+
+        // Switch Tabs (Live vs Uploads)
+        function switchTab(type) {
+            activeTab = type;
+            
+            const btnLive = document.getElementById('tabLive');
+            const btnUploads = document.getElementById('tabUploads');
+            
+            if (type === 'live') {
+                btnLive.className = "px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all bg-primary-600 text-white shadow-lg shadow-primary-500/10";
+                btnUploads.className = "px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all text-gray-400 hover:text-white hover:bg-white/5";
+            } else {
+                btnUploads.className = "px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all bg-primary-600 text-white shadow-lg shadow-primary-500/10";
+                btnLive.className = "px-6 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all text-gray-400 hover:text-white hover:bg-white/5";
+            }
+
+            renderVideos();
+        }
+
+        // Toggle API Key settings layout
+        function toggleApiSettings() {
+            apiSettingsArea.classList.toggle('hidden');
+        }
+
+        // Save API key to localStorage
+        function saveApiKey() {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                localStorage.setItem('yt_api_key', key);
+                alert('API Key kustom disimpan!');
+            } else {
+                localStorage.removeItem('yt_api_key');
+                alert('Menggunakan API Key default Dishub.');
+            }
+            apiSettingsArea.classList.add('hidden');
+            loadChannelData(currentChannel);
+        }
+
+        // Retrieve current active API key
+        function getApiKey() {
+            return localStorage.getItem('yt_api_key') || DEFAULT_API_KEY;
+        }
+
+        // Fetch YouTube API Helper
+        async function callYoutubeApi(endpoint, params = {}) {
+            const key = getApiKey();
+            const queryParams = new URLSearchParams({ ...params, key: key });
+            const url = `https://www.googleapis.com/youtube/v3/${endpoint}?${queryParams.toString()}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                const errMessage = errData.error?.message || `HTTP ${response.status}`;
+                throw new Error(errMessage);
+            }
+            return response.json();
+        }
+
+        // Core YouTube API querying logic
+        async function loadChannelData(handleOrId) {
+            showLoading(true);
+            hideError();
+            hideEmpty();
+            
+            cachedData.live = [];
+            cachedData.uploads = [];
+            channelMeta = null;
+            
+            let cleanQuery = handleOrId.trim();
+            
+            // Mock data for `@CCTVDISHUBKOTAPONTIANAK` for design review proposal
+            const queryUpper = cleanQuery.toUpperCase();
+            if (queryUpper === '@CCTVDISHUBKOTAPONTIANAK' || queryUpper === 'CCTVDISHUBKOTAPONTIANAK') {
+                channelMeta = {
+                    title: "CCTV DISHUB KOTA PONTIANAK",
+                    handle: "@CCTVDISHUBKOTAPONTIANAK",
+                    desc: "Saluran pemantauan CCTV lalu lintas resmi Dinas Perhubungan Kota Pontianak. Halaman ini menyajikan live streaming kondisi jalan protokol secara real-time.",
+                    avatar: "assets/img/logo.png"
+                };
+
+                cachedData.live = [
+                    {
+                        videoId: "U4xmy5gL7EI",
+                        title: "CCTV Live - Simpang Flamboyan (Pontianak)",
+                        thumbnail: "assets/img/cctv-1.png",
+                        isLive: true,
+                        publishedTime: "Sedang Live"
+                    },
+                    {
+                        videoId: "-2Evg8reL8s",
+                        title: "CCTV Live - Simpang Tanjung Hulu (Pontianak)",
+                        thumbnail: "assets/img/cctv-2.png",
+                        isLive: true,
+                        publishedTime: "Sedang Live"
+                    },
+                    {
+                        videoId: "zNA1lktiKRs",
+                        title: "CCTV Live - Simpang Tanjung Raya (Pontianak)",
+                        thumbnail: "assets/img/cctv-3.png",
+                        isLive: true,
+                        publishedTime: "Sedang Live"
+                    },
+                    {
+                        videoId: "NyQ2M6XyVhQ",
+                        title: "CCTV Live - Tugu Digulis Ayani (Pontianak)",
+                        thumbnail: "assets/img/cctv-4.png",
+                        isLive: true,
+                        publishedTime: "Sedang Live"
+                    },
+                    {
+                        videoId: "EwXUTOZ-ueU",
+                        title: "CCTV Live - Jalan Imam Bonjol (Pontianak)",
+                        thumbnail: "assets/img/cctv-5.png",
+                        isLive: true,
+                        publishedTime: "Sedang Live"
+                    },
+                    {
+                        videoId: "7zkunqU28Co",
+                        title: "CCTV Live - Simpang Pajak (Pontianak)",
+                        thumbnail: "assets/img/cctv-6.png",
+                        isLive: true,
+                        publishedTime: "Sedang Live"
+                    }
+                ];
+
+                cachedData.uploads = [...cachedData.live];
+
+                updateChannelUIHeader();
+                renderVideos();
+                showLoading(false);
+                return;
+            }
+            
+            try {
+                // Step 1: Get channel ID & Metadata
+                let channelResponse;
+                if (cleanQuery.startsWith('UC') && cleanQuery.length === 24) {
+                    // It's a channel ID directly
+                    channelResponse = await callYoutubeApi('channels', {
+                        part: 'snippet,contentDetails',
+                        id: cleanQuery
+                    });
+                } else {
+                    // It's a handle
+                    let handle = cleanQuery;
+                    if (!handle.startsWith('@')) {
+                        handle = '@' + handle;
+                    }
+                    channelResponse = await callYoutubeApi('channels', {
+                        part: 'snippet,contentDetails',
+                        forHandle: handle
+                    });
+                }
+
+                if (!channelResponse.items || channelResponse.items.length === 0) {
+                    throw new Error(`Saluran YouTube "${cleanQuery}" tidak ditemukan. Pastikan format penulisan benar.`);
+                }
+
+                const channelItem = channelResponse.items[0];
+                const channelId = channelItem.id;
+                const uploadsPlaylistId = channelItem.contentDetails?.relatedPlaylists?.uploads;
+                
+                channelMeta = {
+                    title: channelItem.snippet.title,
+                    handle: channelItem.snippet.customUrl || cleanQuery,
+                    desc: channelItem.snippet.description || "Channel CCTV Live Monitoring.",
+                    avatar: channelItem.snippet.thumbnails?.medium?.url || channelItem.snippet.thumbnails?.default?.url
+                };
+
+                // Step 2: Fetch Active Live Streams via Search endpoint
+                let liveResponse;
+                try {
+                    liveResponse = await callYoutubeApi('search', {
+                        part: 'snippet',
+                        channelId: channelId,
+                        type: 'video',
+                        eventType: 'live',
+                        maxResults: 10
+                    });
+                } catch(liveErr) {
+                    console.warn("Pencarian live stream aktif gagal/terbatasi quota. Melewati search endpoint...", liveErr);
+                    liveResponse = { items: [] };
+                }
+
+                if (liveResponse.items && liveResponse.items.length > 0) {
+                    cachedData.live = liveResponse.items.map(item => ({
+                        videoId: item.id.videoId,
+                        title: item.snippet.title,
+                        thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.medium?.url || `https://i.ytimg.com/vi/${item.id.videoId}/hqdefault.jpg`,
+                        isLive: true,
+                        publishedTime: 'Sedang Live',
+                        viewCount: ''
+                    }));
+                }
+
+                // Step 3: Fetch uploaded videos (Uploads Playlist Items)
+                if (uploadsPlaylistId) {
+                    const uploadsResponse = await callYoutubeApi('playlistItems', {
+                        part: 'snippet,contentDetails',
+                        playlistId: uploadsPlaylistId,
+                        maxResults: 50
+                    });
+
+                    if (uploadsResponse.items && uploadsResponse.items.length > 0) {
+                        const uploadsList = uploadsResponse.items.map(item => {
+                            const vidId = item.snippet.resourceId?.videoId;
+                            // Check if this video is already in the live list to avoid duplicates
+                            const isAlreadyLive = cachedData.live.some(lv => lv.videoId === vidId);
+                            
+                            // If title contains "LIVE" or the uploads item is live, tag it
+                            const titleUpper = item.snippet.title.toUpperCase();
+                            const matchesLive = titleUpper.includes("LIVE STREAMING") || titleUpper.includes("🔴 LIVE") || titleUpper.includes("CCTV LIVE");
+                            
+                            return {
+                                videoId: vidId,
+                                title: item.snippet.title,
+                                thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.medium?.url || `https://i.ytimg.com/vi/${vidId}/hqdefault.jpg`,
+                                isLive: isAlreadyLive || matchesLive,
+                                publishedTime: new Date(item.snippet.publishedAt).toLocaleDateString('id-ID', {
+                                    day: 'numeric', month: 'short', year: 'numeric'
+                                }),
+                                isAlreadyLive: isAlreadyLive
+                            };
+                        });
+
+                        // All uploads category
+                        cachedData.uploads = uploadsList;
+
+                        // If no live streams were found via search endpoint (e.g. quota limit),
+                        // we can populate the live tab with uploads that have live markers in their titles
+                        if (cachedData.live.length === 0) {
+                            cachedData.live = uploadsList.filter(item => item.isLive);
+                        }
+                    }
+                }
+
+                // Update UI Header and render
+                updateChannelUIHeader();
+                renderVideos();
+                
+            } catch (err) {
+                console.error("API error:", err);
+                showError(`Gagal Memproses Data API: ${err.message}`);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Retry helper
+        function retryLoading() {
+            loadChannelData(currentChannel);
+        }
+
+        // UI Modifiers
+        function showLoading(isLoading) {
+            if (isLoading) {
+                loadingState.classList.remove('hidden');
+                videoGrid.classList.add('opacity-40', 'pointer-events-none');
+                searchBtnIcon.classList.add('animate-spin');
+            } else {
+                loadingState.classList.add('hidden');
+                videoGrid.classList.remove('opacity-40', 'pointer-events-none');
+                searchBtnIcon.classList.remove('animate-spin');
+            }
+        }
+
+        function showError(msg) {
+            errorState.classList.remove('hidden');
+            errorMessage.textContent = msg;
+            channelHeader.classList.add('hidden');
+            videoGrid.innerHTML = '';
+            videoCount.textContent = 'Menampilkan 0 CCTV';
+        }
+
+        function hideError() {
+            errorState.classList.add('hidden');
+        }
+
+        function showEmpty() {
+            emptyState.classList.remove('hidden');
+        }
+
+        function hideEmpty() {
+            emptyState.classList.add('hidden');
+        }
+
+        function updateChannelUIHeader() {
+            if (!channelMeta) return;
+            channelHeader.classList.remove('hidden');
+            
+            const avatarEl = document.getElementById('channelAvatar');
+            if (channelMeta.avatar) {
+                avatarEl.innerHTML = `<img src="${channelMeta.avatar}" alt="${channelMeta.title}" class="w-full h-full object-cover">`;
+            } else {
+                avatarEl.innerHTML = `<i data-lucide="user" class="w-10 h-10 text-gray-400"></i>`;
+                lucide.createIcons();
+            }
+            
+            document.getElementById('channelTitle').textContent = channelMeta.title;
+            document.getElementById('channelHandle').textContent = channelMeta.handle;
+            document.getElementById('channelDesc').textContent = channelMeta.desc || "Tidak ada deskripsi.";
+            
+            let cleanHandle = channelMeta.handle;
+            let ytUrl = "";
+            if (cleanHandle.startsWith('UC')) {
+                ytUrl = `https://www.youtube.com/channel/${cleanHandle}`;
+            } else {
+                ytUrl = `https://www.youtube.com/${cleanHandle}`;
+            }
+            document.getElementById('channelLink').href = ytUrl;
+        }
+
+        // Render current list of videos based on active tab
+        function renderVideos() {
+            hideEmpty();
+            videoGrid.innerHTML = '';
+            
+            const videos = activeTab === 'live' ? cachedData.live : cachedData.uploads;
+            videoCount.textContent = `Menampilkan ${videos.length} CCTV`;
+            
+            if (videos.length === 0) {
+                showEmpty();
+                return;
+            }
+            
+            videos.forEach(video => {
+                const card = document.createElement('div');
+                card.className = "cctv-card block rounded-2xl overflow-hidden glass-light cursor-pointer border border-white/5";
+                card.onclick = () => openPlayer(video.videoId, video.title, video.isLive);
+                
+                const liveBadge = video.isLive 
+                    ? `<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-red-600/90 rounded-lg text-xs font-bold backdrop-blur-sm shadow-md animate-pulse">
+                           <div class="live-dot"></div> LIVE
+                       </div>`
+                    : `<div class="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-gray-800/90 rounded-lg text-xs font-bold text-gray-300 backdrop-blur-sm">
+                           REKAMAN
+                       </div>`;
+
+                card.innerHTML = `
+                    <div class="relative aspect-video overflow-hidden bg-black">
+                        <img src="${video.thumbnail}" alt="${video.title}" 
+                            class="w-full h-full object-cover transition-transform duration-700" 
+                            onerror="this.src='https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=480&h=270&fit=crop&q=80'">
+                        <div class="cctv-overlay absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 transition-opacity duration-300 flex items-end p-4">
+                            <span class="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/90 rounded-lg text-sm font-semibold text-white">
+                                <i data-lucide="play" class="w-4 h-4 fill-white"></i> Play CCTV
+                            </span>
+                        </div>
+                        ${liveBadge}
+                        <div class="absolute top-3 right-3 px-2 py-0.5 bg-black/60 rounded-md text-[10px] font-mono text-gray-300 backdrop-blur-sm">
+                            ${video.videoId}
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-white hover:text-primary-300 transition-colors line-clamp-2 text-sm leading-snug">${video.title}</h3>
+                        <p class="text-xs text-gray-500 mt-2 flex items-center gap-1.5 font-medium">
+                            <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                            ${video.publishedTime || (video.isLive ? 'Sedang Live' : 'Baru-baru ini')}
+                        </p>
+                    </div>
+                `;
+                
+                videoGrid.appendChild(card);
+            });
+            
+            // Reload icons in cards
+            lucide.createIcons();
+        }
+
+        // Open YouTube Embedded Player Modal
+        async function openPlayer(videoId, title, isLive) {
+            playerTitle.textContent = title;
+            youtubeDirectLink.href = `https://www.youtube.com/watch?v=${videoId}`;
+            
+            if (isLive) {
+                playerBadge.className = "flex items-center gap-1 px-2.5 py-1 bg-red-600 rounded-lg text-[10px] font-bold text-white shadow-md";
+                playerBadge.innerHTML = `<div class="live-dot"></div> LIVE`;
+            } else {
+                playerBadge.className = "flex items-center gap-1 px-2.5 py-1 bg-gray-700 rounded-lg text-[10px] font-bold text-gray-300";
+                playerBadge.innerHTML = `REKAMAN`;
+            }
+
+            // Reset visibility states
+            embedDisabledOverlay.classList.add('hidden');
+            youtubeEmbed.classList.remove('hidden');
+
+            playerModal.classList.remove('opacity-0', 'pointer-events-none');
+            playerModal.classList.add('opacity-100', 'pointer-events-auto');
+            modalContainer.classList.remove('scale-95');
+            modalContainer.classList.add('scale-100');
+            document.body.style.overflow = 'hidden';
+            
+            lucide.createIcons();
+
+            // Set source
+            youtubeEmbed.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&rel=0`;
+
+            // Check if embeddable using YouTube API
+            try {
+                const vidData = await callYoutubeApi('videos', {
+                    part: 'status',
+                    id: videoId
+                });
+                
+                if (vidData.items && vidData.items.length > 0) {
+                    const embeddable = vidData.items[0].status?.embeddable;
+                    if (embeddable === false) {
+                        // Hide iframe, show disabled overlay
+                        youtubeEmbed.classList.add('hidden');
+                        embedDisabledOverlay.classList.remove('hidden');
+                        embedDirectBtn.href = `https://www.youtube.com/watch?v=${videoId}`;
+                        lucide.createIcons();
+                    }
+                }
+            } catch(e) {
+                console.warn("Gagal mengecek status embeddable video, gunakan pemutar default", e);
+            }
+        }
+
+        // Close Player Modal
+        function closePlayer() {
+            youtubeEmbed.src = "";
+            embedDisabledOverlay.classList.add('hidden');
+            playerModal.classList.add('opacity-0', 'pointer-events-none');
+            playerModal.classList.remove('opacity-100', 'pointer-events-auto');
+            modalContainer.classList.add('scale-95');
+            modalContainer.classList.remove('scale-100');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal when clicking outside
+        playerModal.addEventListener('click', (e) => {
+            if (e.target === playerModal) {
+                closePlayer();
+            }
+        });
+
+        // Mobile Menu Toggles
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenuClose = document.getElementById('mobileMenuClose');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
+        mobileMenuClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
+        
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.remove('open'));
+        });
+    </script>
+</body>
+
+</html>
